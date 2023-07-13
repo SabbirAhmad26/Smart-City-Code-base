@@ -176,7 +176,8 @@ class Car(AbstractCar):
             else:
                 if (self.angle+90 < 7) or (self.angle+90 > -7):
                     return abs(self.y - poss_start[3][1])/40*13.5
-                # else:
+                else:
+                    return curve_dist(self.x, self.y)
                     
         elif start_angle == 180:
             if self.y < turning_pts[1][1] or self.angle == 180:
@@ -184,7 +185,8 @@ class Car(AbstractCar):
             else:
                 if (self.angle - 90 < 7) or (self.angle-90 > -7):
                     return abs(self.y - poss_start[2][1])/40*13.5
-                # else:
+                else:
+                    return curve_dist(self.x, self.y)
                     
         elif start_angle == 90:
             if self.x > turning_pts[1][0] or self.angle == 90:
@@ -192,7 +194,8 @@ class Car(AbstractCar):
             else:
                 if (self.angle < 7) and (self.angle > -7):
                     return abs(self.x - poss_start[0][0])/40*13.5
-                # else:
+                else:
+                    return curve_dist(self.x, self.y)
                     
         else:
             if self.x < turning_pts[2][0] or (self.angle == 270):
@@ -200,7 +203,8 @@ class Car(AbstractCar):
             else:
                 if (self.angle-180 < 7) or (self.angle-180 > -7):
                     return abs(self.x - poss_start[1][0])/40*13.5
-                # else:
+                else:
+                    return curve_dist(self.x, self.y)
 
 
 fps = 50
