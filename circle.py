@@ -33,3 +33,9 @@ def circle_lst():
     right_circle.append([r,c])
   
   return left_circle, right_circle
+
+def arc_length(circle, a, b):
+  r = circle[0]
+  d = math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
+  theta = math.acos(1-(d**2)/(2*(r**2)))
+  return r*theta
