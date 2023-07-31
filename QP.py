@@ -24,7 +24,6 @@ class Robot:
 
         # reference Trajectory
         vd = 0.5 * c[0] * t ** 2 + c[1] * t + c[2]
-        print(vd)
         u_ref = c[0] * t + c[1]
 
         # Physical Limitations on velocity
@@ -138,5 +137,10 @@ my_robot = Robot(-1, 1, 0.18, 0.18, 0.1, 0, 1)
 my_robot.OCBF_SecondOrderDynamics(1, np.array([[3, 1.082444, 0, -1], [2, 2.25106, 0.5, 0.4373],
                                                [4, 1.1569, 0.5, 1.5314]]),
                                   [0.503779, 0.5, 0.2898, 1.061228, 1.061228, 1.061228])
+
+#position = not MoCap position but the distance from road origin to the car position
+#my_robot.OCBF_SecondOrderDynamics(1, np.array([[car ip's ID, position, velocity, distance to merging point], [car's ID, position, velocity, distance to merging point],
+                                              # [car's ID, position, velocity, distance to merging point]]),
+                                #  [main car's position, velocity, acceleration, distance to the merging point shared with first car, distance to the merging point shared with second car, distance to the merging point shared with third car])
 
 # The 5 additional columns in the state list for our car is the distance of our car from each of the merging points!
