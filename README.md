@@ -1,9 +1,14 @@
 cvxopt install:
 git clone https://github.com/DrTimothyAldenDavis/SuiteSparse.git
+
 pushd SuiteSparse
+
 git checkout v5.6.0
+
 popd
+
 export CVXOPT_SUITESPARSE_SRC_DIR=$(pwd)/SuiteSparse
+
 pip3 install cvxopt
 
 
