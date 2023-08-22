@@ -1,6 +1,6 @@
 import cvxopt
 import numpy as np
-from cvxopt.solvers import qp
+from cvxopt.solvers import lp, qp
 from scipy.integrate import odeint
 from cvxopt import matrix, solvers
 
@@ -15,17 +15,20 @@ class Robot:
         self.v_min = v_min
         self.v_max = v_max
 
-    def OCBF_SecondOrderDynamics(self, i, matrix_const, state):
+    def OCBF_SecondOrderDynamics(self, matrix_const, state):#, dt=0.1):
         ocpar = [-0.593787660013256, 1.41421356237309, 0, 0, 2.38168230431317, 1.68410370801184];
         c = np.array(ocpar)
         x0 = np.array(state)
         eps = 10
         psc = 0.1
-        t = 0.1 * i
+        t = 0.1# * i
+        # t = dt * i
+        # t = dt * 1
 
         # reference Trajectory
-        vd = 0.5 * c[0] * t ** 2 + c[1] * t + c[2]
+        vd = 1# 0.5 * c[0] * t ** 2 + c[1] * t + c[2]
         u_ref = c[0] * t + c[1]
+        u_ref = 1
 
         # Physical Limitations on velocity
         b_vmax = self.v_max - x0[1]
@@ -37,45 +40,38 @@ class Robot:
 
         def solveQP():
 
-            A = np.array([[1, 0], [-1, 0], [phi1, -1], [1, 0], [-1, 0]])
-            b = np.array([self.u_max, -self.u_min, phi0, b_vmax, b_vmin])
+            A = np.array([[1, 0], [-1, 0], [phi1, -1], [1, 0]])
+            b = np.array([self.u_max, -self.u_min, phi0, b_vmax])
 
             # Rear-end Safety Constraints
 
             if matrix_const[0][0] != -1:
                 xip = matrix_const[0][1]
-                h = xip - x0[0] - self.phiRearEnd * x0[1] - self.deltaSafetyDistance
+                print(xip, x0[2])
+                h = xip - x0[2] - self.phiRearEnd * x0[1] - self.deltaSafetyDistance
                 vip = matrix_const[0][2]
-                uminValue = abs(self.u_min)
-                hf = h - 0.5 * (vip - x0[1]) ** 2 / uminValue
-
-                if x0[1] <= vip or hf < 0:
-                    p = 1
-                    LgB = 1
-                    LfB = 2 * p * (vip - x0[1]) + p ** 2 * h
+                LgB = self.phiRearEnd
+                LfB = vip - x0[1]
+                # print(h)
+                if LgB != 0:
                     A = np.append(A, [[LgB, 0]], axis=0)
-                    b = np.append(b, [LfB])
-
-                else:
-                    LgB = self.phiRearEnd - (vip - x0[1]) / uminValue
-                    LfB = vip - x0[1]
-                    if LgB != 0:
-                        A = np.append(A, [[LgB, 0]], axis=0)
-                        b = np.append(b, [LfB + hf])
+                    b = np.append(b, [LfB + h])
 
             # Lateral Safety Constraints
 
             for row_index, row in enumerate(matrix_const):
+                if row_index == 0:
+                    continue
                 if -1 in row:
                     continue
                 else:
                     d1 = matrix_const[row_index][3]
                     d2 = state[row_index + 2]
-                # L = state[row_index + 2] + state[0]
-                L = 2.715
+                L = state[row_index + 2] + state[0]
+                #L = 2.715
 
                 v0 = matrix_const[row_index][2]
-
+                print("there is merging oconstraint")
                 bigPhi = self.phiLateral * x0[0] / L
                 h = d2 - d1 - bigPhi * x0[1] - self.deltaSafetyDistance
 
@@ -107,6 +103,9 @@ class Robot:
             solvers.options['show_progress'] = False
             Solution = qp(H, f, A, b)
 
+            # c = matrix([0.0,0.0])
+            # Solution = lp(c, A, b)
+            print(Solution['x'].trans())
             return Solution['x'].trans()
 
         def second_order_model(x, t, u):
@@ -117,12 +116,19 @@ class Robot:
 
             return dx
 
-        u = (solveQP(),)
-        solution = odeint(second_order_model, x0[0:2], t_span, args=u)
-
-        rt = [solution[-1][0], solution[-1][1], u[0][0]]
-        # x = np.zeros(2)
-        return rt
+        return solveQP()[0]
+        # u = (solveQP(),)
+        # # solution = [0,0]
+        # solution = odeint(second_order_model, x0[0:2], t_span, args=u)
+        # # rt = [0,0,0]
+        # # L = 2.715
+        # # rt[0] = L - state[0] * 0.1#matrix_const[-1][-1]
+        # # rt[1] = state[1] + u[0]*0.1
+        # # rt[2] = u[0]
+        # rt = [solution[-1][0], solution[-1][1], u[0][0]]
+        # # x = np.zeros(2)
+        # # print(u[0][0])
+        # return rt#[-1]
 
 
 t_start = 0
@@ -139,17 +145,18 @@ t_span = (t_start, t_end)
 #         return dx
 #
 
+if __name__ == '__main__':
+    my_robot = Robot(-10, 1, 0.18, 0.18, 0.1, -1, 1)
 
-my_robot = Robot(-1, 1, 0.18, 0.18, 0.1, 0, 1)
+    L = 2.715
+    d2 = 2.2
+    d1 = 0.236
 
-L = 2.715
-d2 = 2.2
-d1 = 0.2
-
-rt = [0, 0, 0]
-while L - rt[0] > 0:
-    rt = my_robot.OCBF_SecondOrderDynamics(1, np.array([[-1, -1, -1, -1], [789, 0.96751131, 0, d1]]
-                                                       ),
-                                           [rt[0], rt[1], -1, L - rt[0]])
-    print([L-rt[0], rt[1], rt[2]])
-
+    rt = [0, 0, 0]
+    while L - rt[0] > 0:
+        rt = my_robot.OCBF_SecondOrderDynamics(1, np.array([[-1, -1, -1, -1], [789, 0.96751131, 0, d1]]
+                                                           ),
+                                               [rt[0], rt[1], -1, L - rt[0]])
+        # print([L-rt[0], rt[1], rt[2]])
+        # print(rt[1])
+        print("|{:^9.4f}|{:^9.4f}|{:^9.4f}|".format(L-rt[0], rt[1], rt[2]))
