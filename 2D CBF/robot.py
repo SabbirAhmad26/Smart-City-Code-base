@@ -24,8 +24,8 @@ class Robot:
         self.acc = 0
         self.umin = -10
         self.umax = 5
-        self.steermax = 0.69
-        self.steermin = -0.69
+        self.steermax = 0.78
+        self.steermin = -0.78
         self.vmin = 0
         self.vmax = 0.5
         self.lf = 0.39
@@ -206,7 +206,7 @@ class LIMO(Robot):
 
 
         # H = np.array([[1.0, 0, 0, 0],[0, 0.0001, 0, 0],[0, 0, 2*psc, 0],[0, 0, 0, 10*psc]])
-        H = np.array([[1.0, 0, 0, 0, 0], [0, 1.0, 0, 0, 0], [0, 0, 2 * psc, 0, 0], [0, 0, 0, 0.4 * psc, 0],
+        H = np.array([[1.0, 0, 0, 0, 0], [0, 1.0, 0, 0, 0], [0, 0, 2 * psc, 0, 0], [0, 0, 0, 1 * psc, 0],
                       [0, 0, 0, 0, 1 * psc]])
         f = np.zeros((5, 1))
 
@@ -228,9 +228,9 @@ class LIMO(Robot):
                     u[0] = self.umax
                 else:
                     u[0] = self.umin
-
-            self.CBF.append(Lf2B + Lg2acc*u[0] + Lg2psi*u[1])
-            self.distance.append(B)
+            if obstacles != []:
+                self.CBF.append(Lf2B + Lg2acc*u[0] + Lg2psi*u[1])
+                self.distance.append(B)
         except:
             # Handle the case when no optimal solution is found
             u = matrix([self.umin/2, 0.0])  # [-cd * m * g, 0]
