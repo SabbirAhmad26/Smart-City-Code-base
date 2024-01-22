@@ -4,17 +4,15 @@ from map import Map
 from robot import LIMO
 
 
-def main(origin, destination, render_mode, data_plot):
+def main(origin, destination, obs, params, render_mode, data_plot):
     goal = {'x': destination[0], 'y': destination[1]}
-    # obs = [{'x': 1.2, 'y': -0.2, 'r': 0.1}, {'x': 2.4, 'y': 0.2, 'r': 0.1}]
-    obs = [{'x': 1.5, 'y': 0.02, 'r': 0.1}]
+    obs = [{'x': obs[0], 'y': obs[1], 'r': obs[2]}]
     limo = LIMO([origin[0], origin[1], 0, 0])
     map = Map(origin, destination, render_mode, data_plot)
     dt = 0.1
-    dist2goal = np.sqrt((limo.x - goal['x']) ** 2 + np.sqrt(limo.y - goal['y']) ** 2)
+    dist2goal = np.sqrt((limo.x - goal['x']) ** 2 + (limo.y - goal['y']) ** 2)
     iter = 0
-    # params = [0.1, 0.5, 2.2710451529971425, 0.9151994081810154]
-    params = [0.7, 0.6, 2.2710451529971425, 0.9151994081810154]
+
     while dist2goal > 0.05:
         # Data logging
         limo.data['x'].append(limo.x)
@@ -35,7 +33,11 @@ def main(origin, destination, render_mode, data_plot):
 
 
 if __name__ == '__main__':
-    origin = (0, 0)
-    destiniation = (4, 0)
-    data = main(origin, destiniation, render_mode=True, data_plot=True)
+    origin = (0, 0)  # where robot starts
+    destiniation = (4, 0)  # where robot ends
+    obs = (1, 0.02, 0.1)  # obstacle (x, y, radius)
+    params = [1, 1]  # cbf class-k parameters
+    data = main(origin, destiniation, obs, params, render_mode=True, data_plot=True)
+    stop = 1
+
 
