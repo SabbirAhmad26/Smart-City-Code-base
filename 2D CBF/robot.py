@@ -121,7 +121,7 @@ class LIMO(Robot):
 
         dist_dst = np.sqrt((x0 - xd) ** 2 + (y0 - yd) ** 2)
         # Calculate vd
-        vd = dist_dst * self.vmax
+        vd = self.vmax
         V_speed = (v0 - vd) ** 2
         LfV_speed = eps*V_speed
         LgV_speed = 2*(v0 - vd)
@@ -191,22 +191,22 @@ class LIMO(Robot):
 
 
 
-        k1 = 1
-        k2 = 1
-        V = (y0 - 0)
-        LfV = k1 * (y0 - 0) ** 2 + v0 * np.sin(psi0) * (2 * y0 - 2 * 0)
-        L2fV = k2 * (k1 * (y0 - 0) ** 2 + v0 * np.sin(psi0) * (2 * y0 - 2 * 0)) + v0 * np.sin(psi0) * (
-                    2 * v0 * np.sin(psi0) + k1 * (2 * y0 - 2 * 0))
-        LfLg_psi = (v0**2*np.cos(psi0)*(2*y0 - 2*0))/(self.lf + self.lr)
-        Psi2_Lg_u = np.sin(psi0)*(2*y0 - 2*0)
-
-        A = np.append(A, [[Psi2_Lg_u, LfLg_psi, 0,  0, -1]], axis=0)
-        b = np.append(b, [-L2fV])
+        # k1 = 1
+        # k2 = 1
+        # V = (y0 - 1.9)
+        # LfV = k1 * (y0 - 1.9) ** 2 + v0 * np.sin(psi0) * (2 * y0 - 2 * 1.9)
+        # L2fV = k2 * (k1 * (y0 - 1.9) ** 2 + v0 * np.sin(psi0) * (2 * y0 - 2 * 1.9)) + v0 * np.sin(psi0) * (
+        #             2 * v0 * np.sin(psi0) + k1 * (2 * y0 - 2 * 1.9))
+        # LfLg_psi = (v0**2*np.cos(psi0)*(2*y0 - 2*1.9))/(self.lf + self.lr)
+        # Psi2_Lg_u = np.sin(psi0)*(2*y0 - 2*1.9)
+        #
+        # A = np.append(A, [[Psi2_Lg_u, LfLg_psi, 0,  0, -1]], axis=0)
+        # b = np.append(b, [-L2fV])
 
 
 
         # H = np.array([[1.0, 0, 0, 0],[0, 0.0001, 0, 0],[0, 0, 2*psc, 0],[0, 0, 0, 10*psc]])
-        H = np.array([[1.0, 0, 0, 0, 0], [0, 1.0, 0, 0, 0], [0, 0, 2 * psc, 0, 0], [0, 0, 0, 1 * psc, 0],
+        H = np.array([[1.0, 0, 0, 0, 0], [0, 1.0, 0, 0, 0], [0, 0, 2 * psc, 0, 0], [0, 0, 0, 200 * psc, 0],
                       [0, 0, 0, 0, 1 * psc]])
         f = np.zeros((5, 1))
 
