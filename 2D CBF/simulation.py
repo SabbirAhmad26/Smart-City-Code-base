@@ -31,13 +31,11 @@ def main(origin, destination, obs, params, render_mode, data_plot):
 
     return limo.data
 
-
 if __name__ == '__main__':
-    origin = (0, 0)  # where robot starts
-    destiniation = (4, 0)  # where robot ends
-    obs = (1, 0.02, 0.1)  # obstacle (x, y, radius)
-    params = [1, 1]  # cbf class-k parameters
+    origin = (1.7, 1.9)  # where robot starts
+    destiniation = (6.4, 1.9)  # where robot ends
+    obs = (4.0, 1.88, 0.17)  # obstacle (x, y, radius)
+    params = [0.8, 0.5]  # cbf class-k parameters
     data = main(origin, destiniation, obs, params, render_mode=True, data_plot=True)
     stop = 1
-
 
