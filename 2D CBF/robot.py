@@ -24,8 +24,8 @@ class Robot:
         self.acc = 0
         self.umin = -10
         self.umax = 5
-        self.steermax = 0.46
-        self.steermin = -0.46
+        self.steermax = 0.79
+        self.steermin = -0.79
         self.vmin = 0
         self.vmax = 0.5
         self.lf = 0.39
